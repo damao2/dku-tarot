@@ -222,8 +222,8 @@
 
 .gesture-mini {
   position: fixed;
-  top: var(--space-lg);
-  right: var(--space-lg);
+  bottom: var(--space-lg);
+  left: var(--space-lg);
   width: 160px;
   height: 120px;
   border-radius: var(--radius-md);

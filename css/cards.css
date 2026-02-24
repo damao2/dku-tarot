@@ -20,8 +20,8 @@
 }
 
 .deck-card {
-  width: 120px;
-  height: 190px;
+  width: 150px;
+  height: 240px;
   flex: 0 0 auto;
   animation: none;
 }
@@ -29,6 +29,13 @@
 .deck-card.selected {
   transform: translateY(-8px) scale(1.03);
   box-shadow: 0 0 20px rgba(197,160,101,0.45);
+}
+
+@media (max-width: 768px) {
+  .deck-card {
+    width: 130px;
+    height: 210px;
+  }
 }
 
 /* Single card layout */

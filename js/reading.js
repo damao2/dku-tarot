@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalCards = sectionData.positions.length;
   let selectedCards = [];
   const selectedIds = new Set();
+  let isFinalizing = false;
 
   function updateCount() {
     if (selectionCount) {
@@ -62,7 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const slot = document.createElement('div');
       slot.className = 'slot-card';
       slot.dataset.index = index;
-      slot.innerHTML = `<span class="slot-label">${label}</span>`;
+      slot.innerHTML = `
+        <div class="slot-media" aria-hidden="true"></div>
+        <span class="slot-label">${label}</span>
+      `;
       slotRow.appendChild(slot);
     });
   }
@@ -71,19 +75,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const slot = slotRow?.querySelector(`.slot-card[data-index="${index}"]`);
     if (!slot) return;
     slot.innerHTML = `
-      <img src="assets/tarot/pkt/${card.id}.jpg" alt="${card.name}">
+      <div class="slot-media">
+        <img src="assets/tarot/pkt/${card.id}.jpg" alt="${card.name}">
+      </div>
       <span class="slot-label">${sectionData.positions[index]}</span>
     `;
   }
 
   function finalizeSelection() {
-    const overlay = document.getElementById('chat-overlay');
-    if (overlay) overlay.classList.add('open');
+    if (isFinalizing) return;
+    isFinalizing = true;
 
-    const summary = CardEngine.getCardSummary(selectedCards, sectionData.positions);
-    const cardMessage = `[CARD DRAW RESULTS]\n${summary}\n[END CARD DRAW]\n\nPlease provide a reading based on these cards, connecting them to what I shared earlier.`;
-    ChatEngine.addHiddenUserMessage(cardMessage);
-    ChatEngine.triggerAutoResponse();
+    // Give the user a moment to see the final card land.
+    setTimeout(() => {
+      const overlay = document.getElementById('chat-overlay');
+      if (overlay) overlay.classList.add('open');
+
+      const summary = CardEngine.getCardSummary(selectedCards, sectionData.positions);
+      const cardMessage = `[CARD DRAW RESULTS]\n${summary}\n[END CARD DRAW]\n\nPlease provide a reading based on these cards, connecting them to what I shared earlier.`;
+      ChatEngine.addHiddenUserMessage(cardMessage);
+      ChatEngine.triggerAutoResponse();
+    }, 1000);
   }
 
   renderSlots();
