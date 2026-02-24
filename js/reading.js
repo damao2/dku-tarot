@@ -50,6 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectedIds = new Set();
   let isFinalizing = false;
 
+  // Layout hint: single-card draws (e.g. Daily Fortune) look better with a narrower slot.
+  const selectionStage = document.getElementById('selection-stage');
+  if (selectionStage) {
+    selectionStage.classList.toggle('single-pick', totalCards === 1);
+  }
+
   function updateCount() {
     if (selectionCount) {
       selectionCount.textContent = `Selected ${selectedCards.length}/${totalCards}`;
@@ -82,6 +88,92 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
+  function animateSlotPop(slotIndex) {
+    const slot = slotRow?.querySelector(`.slot-card[data-index="${slotIndex}"]`);
+    if (!slot) return;
+    slot.classList.remove('slot-just-filled');
+    // Force reflow to restart the animation
+    void slot.offsetWidth;
+    slot.classList.add('slot-just-filled');
+  }
+
+  function animateCardFlyToSlot(sourceCardEl, slotIndex, card, options = {}) {
+    const slot = slotRow?.querySelector(`.slot-card[data-index="${slotIndex}"]`);
+    const slotMedia = slot?.querySelector('.slot-media');
+    if (!sourceCardEl || !slotMedia) return;
+
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (prefersReducedMotion || typeof sourceCardEl.getBoundingClientRect !== 'function') {
+      options.onFinish?.();
+      animateSlotPop(slotIndex);
+      return;
+    }
+
+    const from = sourceCardEl.getBoundingClientRect();
+    const to = slotMedia.getBoundingClientRect();
+
+    const fromCenterX = from.left + from.width / 2;
+    const fromCenterY = from.top + from.height / 2;
+    const toCenterX = to.left + to.width / 2;
+    const toCenterY = to.top + to.height / 2;
+    const dx = toCenterX - fromCenterX;
+    const dy = toCenterY - fromCenterY;
+
+    const rawScale = Math.min(to.width / from.width, to.height / from.height);
+    const scale = Number.isFinite(rawScale) && rawScale > 0 ? rawScale : 1;
+    const imageSrc = `assets/tarot/pkt/${card.id}.jpg`;
+
+    const fly = document.createElement('div');
+    fly.className = 'card-fly';
+    fly.style.left = `${from.left}px`;
+    fly.style.top = `${from.top}px`;
+    fly.style.width = `${from.width}px`;
+    fly.style.height = `${from.height}px`;
+    fly.innerHTML = `
+      <div class="card-fly-inner">
+        <div class="card-fly-back"></div>
+        <div class="card-fly-front" style="background-image:url('${imageSrc}')"></div>
+      </div>
+    `;
+    document.body.appendChild(fly);
+
+    const prevSourceOpacity = sourceCardEl.style.opacity;
+    sourceCardEl.style.opacity = '0.22';
+
+    const flyAnim = fly.animate([
+      { transform: 'translate3d(0,0,0) scale(1)', opacity: 1 },
+      { transform: `translate3d(${dx * 0.55}px, ${dy * 0.55}px, 0) scale(${Math.max(0.9, scale)})`, opacity: 1, offset: 0.6 },
+      { transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`, opacity: 1 }
+    ], {
+      duration: 720,
+      easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+      fill: 'forwards'
+    });
+
+    const inner = fly.querySelector('.card-fly-inner');
+    inner?.animate([
+      { transform: 'rotateY(0deg)' },
+      { transform: 'rotateY(180deg)' }
+    ], {
+      duration: 520,
+      easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+      fill: 'forwards'
+    });
+
+    flyAnim.onfinish = () => {
+      sourceCardEl.style.opacity = prevSourceOpacity;
+      options.onFinish?.();
+      animateSlotPop(slotIndex);
+
+      const fade = fly.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 140,
+        easing: 'ease-out',
+        fill: 'forwards',
+      });
+      fade.onfinish = () => fly.remove();
+    };
+  }
+
   function finalizeSelection() {
     if (isFinalizing) return;
     isFinalizing = true;
@@ -107,7 +199,12 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedIds.add(card.id);
       selectedCards.push(card);
       cardEl.classList.add('selected');
-      fillSlot(card, selectedCards.length - 1);
+      const slotIndex = selectedCards.length - 1;
+      requestAnimationFrame(() => {
+        animateCardFlyToSlot(cardEl, slotIndex, card, {
+          onFinish: () => fillSlot(card, slotIndex),
+        });
+      });
       updateCount();
       if (selectedCards.length === totalCards) {
         finalizeSelection();
@@ -247,7 +344,12 @@ document.addEventListener('DOMContentLoaded', () => {
               if (card && !selectedIds.has(card.id)) {
                 selectedIds.add(card.id);
                 selectedCards.push(card);
-                fillSlot(card, selectedCards.length - 1);
+                const slotIndex = selectedCards.length - 1;
+                requestAnimationFrame(() => {
+                  animateCardFlyToSlot(cardEl, slotIndex, card, {
+                    onFinish: () => fillSlot(card, slotIndex),
+                  });
+                });
                 updateCount();
                 if (selectedCards.length === totalCards) {
                   finalizeSelection();
