@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DKU Tarot - Reading</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/reading.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/chat.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="reading-page">
+    <!-- Header -->
+    <header class="reading-header">
+      <a href="index.html" class="back-btn">
+        <span class="material-icons">arrow_back</span>
+        <span>Home</span>
+      </a>
+      <span class="section-title">Reading</span>
+      <div class="header-actions">
+        <button class="settings-icon" data-open-settings aria-label="Settings">
+          <span class="material-icons">settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Selection Stage -->
+    <div class="selection-stage" id="selection-stage">
+      <div class="selection-header">
+        <div class="spread-label" id="selection-title">Your Spread</div>
+        <p class="selection-prompt" id="selection-prompt"></p>
+        <div class="selection-count" id="selection-count">Selected 0/0</div>
+      </div>
+
+      <div class="deck-stage" id="deck-stage">
+        <div class="deck-track" id="deck-track"></div>
+        <div class="gesture-cursor" id="gesture-cursor"></div>
+      </div>
+
+      <div class="gesture-mini" aria-hidden="true">
+        <video id="gesture-video" playsinline></video>
+        <canvas id="gesture-canvas"></canvas>
+      </div>
+
+      <div class="slot-row" id="slot-row"></div>
+
+    </div>
+
+    <!-- Chat Overlay -->
+    <div class="chat-overlay" id="chat-overlay">
+      <div class="chat-panel overlay-panel">
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+              <textarea id="chat-input" placeholder="Share your thoughts with the Oracle..." rows="1"></textarea>
+              <button class="send-btn" id="chat-send" aria-label="Send message">
+                <span class="material-icons">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config Modal -->
+  <div class="config-modal-overlay" id="config-modal-overlay">
+    <div class="config-modal">
+      <h3>Oracle Settings</h3>
+      <div class="form-group">
+        <label for="config-api-url">API Endpoint</label>
+        <input type="text" id="config-api-url" placeholder="https://api.openai.com/v1/chat/completions">
+      </div>
+      <div class="form-group">
+        <label for="config-api-key">API Key</label>
+        <input type="password" id="config-api-key" placeholder="sk-...">
+      </div>
+      <div class="form-group">
+        <label for="config-model">Model</label>
+        <input type="text" id="config-model" placeholder="gpt-4o-mini">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel">Cancel</button>
+        <button class="btn btn-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts in dependency order -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/tarot-data.js"></script>
+  <script src="js/prompts.js"></script>
+  <script src="js/card-engine.js"></script>
+  <script src="js/chat-engine.js"></script>
+  <script src="js/gesture-engine.js"></script>
+  <script src="js/reading.js"></script>
+</body>
+</html>

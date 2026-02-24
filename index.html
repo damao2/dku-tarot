@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DKU Tarot - Mystical Guidance for Campus Life</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/chat.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="landing-page">
+    <header class="landing-header">
+      <h1>DKU TAROT</h1>
+      <p class="subtitle">Mystical Guidance for Campus Life</p>
+    </header>
+
+    <div class="section-grid">
+      <a href="reading.html?section=daily" class="section-card">
+        <div class="card-icon">
+          <span class="material-icons">wb_sunny</span>
+        </div>
+        <h2>Daily Fortune</h2>
+        <p>Draw a single card to discover the energy shaping your day on campus.</p>
+      </a>
+
+      <a href="reading.html?section=course" class="section-card">
+        <div class="card-icon">
+          <span class="material-icons">auto_stories</span>
+        </div>
+        <h2>Course Oracle</h2>
+        <p>Seek guidance on academic choices, study challenges, and your scholarly path.</p>
+      </a>
+
+      <a href="reading.html?section=lost" class="section-card">
+        <div class="card-icon">
+          <span class="material-icons">search</span>
+        </div>
+        <h2>Lost &amp; Found</h2>
+        <p>Whether it's your water bottle or your motivation — the cards know where to look.</p>
+      </a>
+
+      <a href="reading.html?section=next" class="section-card">
+        <div class="card-icon">
+          <span class="material-icons">moving</span>
+        </div>
+        <h2>Next Steps</h2>
+        <p>At a crossroads? Let the tarot illuminate your path forward beyond DKU.</p>
+      </a>
+    </div>
+
+    <div class="gesture-cursor" id="gesture-cursor" aria-hidden="true"></div>
+
+    <div class="gesture-mini" aria-hidden="true">
+      <video id="gesture-video" playsinline></video>
+      <canvas id="gesture-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Settings gear -->
+  <button class="settings-btn" data-open-settings aria-label="Settings">
+    <span class="material-icons">settings</span>
+  </button>
+
+  <!-- Config Modal -->
+  <div class="config-modal-overlay" id="config-modal-overlay">
+    <div class="config-modal">
+      <h3>Oracle Settings</h3>
+      <div class="form-group">
+        <label for="config-api-url">API Endpoint</label>
+        <input type="text" id="config-api-url" placeholder="https://api.openai.com/v1/chat/completions">
+      </div>
+      <div class="form-group">
+        <label for="config-api-key">API Key</label>
+        <input type="password" id="config-api-key" placeholder="sk-...">
+      </div>
+      <div class="form-group">
+        <label for="config-model">Model</label>
+        <input type="text" id="config-model" placeholder="gpt-4o-mini">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel">Cancel</button>
+        <button class="btn btn-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/gesture-engine.js"></script>
+  <script src="js/landing.js"></script>
+</body>
+</html>
